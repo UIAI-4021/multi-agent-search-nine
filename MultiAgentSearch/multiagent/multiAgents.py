@@ -122,10 +122,10 @@ class MultiAgentSearchAgent(Agent):
         self.index = 0  # Pacman is always agent index 0
         self.evaluationFunction = util.lookup(evalFn, globals())
         self.depth = int(depth)
-        self.time_limit = int(time_limit)
+        self.temperature = int(time_limit)
 
 
-class AIAgent(MultiAgentSearchAgent):  # minimax agent
+class MinimaxAgent(MultiAgentSearchAgent):
 
     def minimax(self, gameState, agentIndex, depth):
         if gameState.isWin() or gameState.isLose() or depth == self.depth:
