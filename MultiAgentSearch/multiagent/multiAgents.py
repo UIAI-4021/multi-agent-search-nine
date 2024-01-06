@@ -16,18 +16,11 @@ from util import manhattanDistance
 from game import Directions
 import random
 import util
-import math
 from game import Agent
 from pacman import GameState
 
 
 def scoreEvaluationFunction(currentGameState: GameState):
-    """
-    This default evaluation function just returns the score of the state.
-    The score is the same one displayed in the Pacman GUI.
-
-    This evaluation function is meant for use with adversarial search agents
-    """
     return currentGameState.getScore()
 
 
@@ -40,9 +33,6 @@ class MultiAgentSearchAgent(Agent):
 
 
 class AIAgent(MultiAgentSearchAgent):
-    """
-    Your minimax agent with alpha-beta pruning (question 3)
-    """
 
     def alphaBeta(self, gameState, agentIndex, depth, alpha, beta):
         if gameState.isWin() or gameState.isLose() or depth == self.depth:
@@ -57,6 +47,7 @@ class AIAgent(MultiAgentSearchAgent):
         v = float("-inf")
         bestAction = None
         allActions = state.getLegalActions(agentIndex)
+        valueActions = {}
         for action in allActions:
             successor = state.generateSuccessor(agentIndex, action)
             successorIndex = agentIndex + 1
@@ -67,24 +58,20 @@ class AIAgent(MultiAgentSearchAgent):
                 successorDepth += 1
 
             successorValue = self.alphaBeta(successor, successorIndex, successorDepth, alpha, beta)[0]
+            valueActions[action] = successorValue
 
             if successorValue > v:
-                if action == Directions.STOP:
-                    x = (self.temperature - 0.5) * 12
-                    s = 1 / (1 + math.exp(-x))
-                    reduce_amount = s * 0.9 + 0.1
-                    successorValue *= reduce_amount
-                    if successorValue > v:
-                        v = successorValue
-                        bestAction = action
-                else:
-                    v = successorValue
-                    bestAction = action
+                v = successorValue
+                bestAction = action
 
             if v > beta:
                 return v, bestAction
 
             alpha = max(alpha, v)
+
+        result = [key for key, value in valueActions.items() if value == max(valueActions.values())]
+        if len(result) > 1:
+            bestAction = random.choice(result)
         return v, bestAction
 
     def minValue(self, state, currentDepth, agentIndex, alpha, beta):
@@ -110,6 +97,7 @@ class AIAgent(MultiAgentSearchAgent):
                 return v, bestAction
 
             beta = min(beta, v)
+
         return v, bestAction
 
     def getAction(self, gameState: GameState):
@@ -118,9 +106,6 @@ class AIAgent(MultiAgentSearchAgent):
         """
         "*** YOUR CODE HERE ***"
 
-        self.temperature -= 0.005
-        if self.temperature < 0.01:
-            self.temperature = 0.01
         bestScore, bestAction = self.alphaBeta(gameState, 0, 0, float("-inf"), float("inf"))
 
         return bestAction
