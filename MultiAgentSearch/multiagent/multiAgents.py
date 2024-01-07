@@ -101,10 +101,6 @@ class AIAgent(MultiAgentSearchAgent):
         return v, bestAction
 
     def getAction(self, gameState: GameState):
-        """
-        Returns the minimax action using self.depth and self.evaluationFunction
-        """
-        "*** YOUR CODE HERE ***"
 
         bestScore, bestAction = self.alphaBeta(gameState, 0, 0, float("-inf"), float("inf"))
 
